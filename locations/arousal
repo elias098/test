@@ -1,0 +1,568 @@
+# arousal
+
+!!{For checking arousal and when applicable triggering orgasms.
+$ARGS[0] the action causing arousal can be when receiving any of the following:
+'masturbate' 'porn' 'voyeur' 'kiss' 'breasts' 'massage' 'foreplay' 'cuni' 'rimming' 'trib' 'anal' 'anal_finger' 'anal_fist' 'anal_dildo' 'anal_strap' 'anal_vibe' 'vaginal' 'vaginal_finger' 'vaginal_fist' 'vaginal_dildo' 'vaginal_strap' 'vaginal_vibe'
+also when giving any of the following:
+'flash_breasts' 'flash_pussy' 'flash_ass' 'kiss_give' 'breasts_give' 'massage_give' 'foreplay_give' 'cuni_give' 'rimming_give' 'anal_finger_give' 'anal_fist_give' 'anal_dildo_give' 'anal_vibe_give' 'anal_strap_give'
+'vaginal_finger_give' 'vaginal_fist_give' 'vaginal_dildo_give' 'vaginal_strap_give' 'vaginal_vibe_give' 'hj' 'bj' 'footjob'
+All acts are from Sveta''s perspective and in cases of both giving and receiving, receiving should be used.
+ARGS[1] for time taken in minutes
+$ARGS[2] - [9] Are optional but can be upto 7 fetishes involved in the act and can be any of the following:
+'maso' 'bound' 'beast' 'exhibitionism' 'rough' 'prostitution' 'dom' 'sub' 'incest' 'feet' 'lesbian' 'group' 'gangbang' 'humiliation' 'deepthroat' 'unknown'
+Format to use: gs 'arousal', 'act', 'duration', 'fetish', 'fetish', 'fetish', 'fetish', 'fetish', 'fetish', 'fetish', 'fetish'
+eg: gs 'arousal', 'trib', 10, 'bound', 'sub'
+In this case lesbianism is automatically added, much as feet would be applied to 'footjob'
+Only call one at a time, if more required, use multiple calls
+You can override the orgasm to force or prevent, to do so use:
+$orgasm_or = 'yes' to force orgasm, it will reset in orgasm call so if you want to force it again, you have to enter it again
+*$orgasm_or = 'custom' to force orgasm and use custom text set as $orgasm_txt - *you can just add the text and call with 'yes' this is old method
+$orgasm_or = 'no' to prevent orgasm, it will remain in place until manually changed, or if end is called.
+}
+
+temp_anal = 0
+
+if $ARGS[0] ! 'end' and $ARGS[0] ! 'checks':
+
+!!	This is to allow a Succubus with the right skill level to handle any size then go back to original size
+	if succubusflag = 1 and sucskill >= 4:
+		if dick ! pcs_vag:
+			if dick < pcs_vag - 5 or dick > pcs_vag + 5: pcs_mood -= 10
+			if sucvagorg = 0: sucvagorg = pcs_vag
+			pcs_vag = dick
+		end
+		if dick ! pcs_ass:
+			if dick < pcs_ass - 5 or dick > pcs_ass + 5: pcs_mood -= 10
+			if sucanusorg = 0: sucanusorg = pcs_ass
+			pcs_ass = dick
+		end
+	end
+
+!!set a magnitude as a random
+	stim['mag'] = rand(1,100)
+
+	if stim['mag'] < 3:
+		stim['mag'] = 0
+	elseif stim['mag'] < 13:
+		stim['mag'] = 1
+	elseif stim['mag'] < 24:
+		stim['mag'] = 2
+	elseif stim['mag'] < 40:
+		stim['mag'] = 3
+	elseif stim['mag'] < 50:
+		stim['mag'] = 4
+	elseif stim['mag'] < 60:
+		stim['mag'] = 5
+	elseif stim['mag'] < 70:
+		stim['mag'] = 6
+	elseif stim['mag'] < 85:
+		stim['mag'] = 7
+	elseif stim['mag'] < 95:
+		stim['mag'] = 8
+	else
+		stim['mag'] = 9
+	end
+
+!!add counter and effects due to action
+	if $ARGS[0] = 'masturbate':
+		counter['mast'] = 1
+		stim['mag'] += 6
+		stim['act'] = 100
+	elseif $ARGS[0] = 'porn':
+		counter['porn'] = 1
+		stim['act'] = 20
+	elseif $ARGS[0] = 'voyeur':
+		counter['voyeur'] = 1
+		stim['act'] = 30
+	elseif $ARGS[0] = 'kiss':
+		stim['act'] = 10
+	elseif $ARGS[0] = 'breasts':
+		stim['act'] = 30
+	elseif $ARGS[0] = 'massage':
+		stim['act'] = 25
+	elseif $ARGS[0] = 'foreplay':
+		stim['act'] = 20
+	elseif $ARGS[0] = 'cuni':
+		counter['cuni'] = 1
+		stim['mag'] += 4
+		stim['act'] = 80
+	elseif $ARGS[0] = 'rimming':
+		counter['rimming'] = 1
+		stim['act'] = 30
+	elseif $ARGS[0] = 'trib':
+		counter['trib'] = 1
+		stim['mag'] += 3
+		stim['act'] = 70
+		stim_les = 1
+	elseif $ARGS[0] = 'anal':
+		temp_anal = 1
+		counter['anal'] = 1
+		if dick > pcs_ass: pcs_ass += 1
+		if ((pcs_ass + lubonus + 2) * 2) <= dick:
+			!!Painfully too big for PC
+			stim['act'] = 20
+			if agape < 3:agape = 3
+		elseif (pcs_ass + lubonus + 2) < dick:
+			!!Big, but more bearable
+			stim['act'] = 65
+			if agape < 1:agape = 1
+		elseif pcs_ass + lubonus + 2 >= dick:
+			!!Perfect size
+			stim['act'] = 80
+		end
+	elseif $ARGS[0] = 'anal_finger':
+		temp_anal = 1
+		counter['anal_finger'] = 1
+		stim['act'] = 40
+	elseif $ARGS[0] = 'anal_fist':
+		temp_anal = 1
+		counter['anal_fist'] = 1
+		stim['act'] = 30
+		if pcs_ass > 30:
+			pcs_ass += 30
+			if agape < 3:agape = 3
+		end
+	elseif $ARGS[0] = 'anal_dildo':
+		temp_anal = 1
+		counter['anal_dildo'] = 1
+		if dick > pcs_ass: pcs_ass += 1
+		if ((pcs_ass + lubonus + 2) * 2) <= dick:
+			!!Painfully too big for PC
+			stim['act'] = 20
+			if agape < 3:agape = 3
+		elseif (pcs_ass + lubonus + 2) < dick:
+			!!Big, but more bearable
+			stim['act'] = 65
+			if agape < 1:agape = 1
+		elseif pcs_ass + lubonus + 2 >= dick:
+			!!Perfect size
+			stim['act'] = 80
+		end
+	elseif $ARGS[0] = 'anal_strap':
+		temp_anal = 1
+		counter['anal_strap'] = 1
+		if dick > pcs_ass: pcs_ass += 1
+		if ((pcs_ass + lubonus + 2) * 2) <= dick:
+			!!Painfully too big for PC
+			stim['act'] = 20
+			if agape < 3:agape = 3
+		elseif (pcs_ass + lubonus + 2) < dick:
+			!!Big, but more bearable
+			stim['act'] = 65
+			if agape < 1:agape = 1
+		elseif pcs_ass + lubonus + 2 >= dick:
+			!!Perfect size
+			stim['act'] = 80
+		end
+	elseif $ARGS[0] = 'anal_vibe':
+		temp_anal = 1
+		counter['anal_vibe'] = 1
+		stim['mag'] += 1
+		stim['act'] = 60
+	elseif $ARGS[0] = 'vaginal':
+		counter['vaginal'] = 1
+		stim['mag'] += 3
+		if dick > pcs_vag: pcs_vag += 1
+		prinat = pcs_vag + (pcs_horny / 10)
+		if dick >= prinat * 2:
+			!!Painfully too big for PC
+			stim['act'] = 40
+			if vgape < 3:vgape = 3
+		elseif dick > prinat:
+			!!Big, but more bearable
+			stim['act'] = 75
+			if vgape < 1:vgape = 1
+		elseif dick <= prinat and dick >= pcs_vag:
+			!!Perfect size
+			stim['act'] = 90
+		elseif dick < pcs_vag:
+			!!On the small side
+			stim['act'] = 80
+		end
+	elseif $ARGS[0] = 'vaginal_finger':
+		counter['vaginal_finger'] = 1
+		stim['mag'] += 1
+		stim['act'] = 80
+	elseif $ARGS[0] = 'vaginal_fist':
+		counter['vaginal_fist'] = 1
+		stim['act'] = 70
+		if pcs_vag + (pcs_horny / 10) < 30:
+			pcs_vag += 3
+			if vgape < 3:vgape = 3
+		end
+	elseif $ARGS[0] = 'vaginal_dildo':
+		counter['vaginal_dildo'] = 1
+		stim['mag'] += 1
+		if dick > pcs_vag: pcs_vag += 1
+		prinat = pcs_vag + (pcs_horny / 10)
+		if dick >= prinat * 2:
+			!!Painfully too big for PC
+			stim['act'] = 20
+			if vgape < 3:vgape = 3
+		elseif dick > prinat:
+			!!Big, but more bearable
+			stim['act'] = 65
+			if vgape < 1:vgape = 1
+		elseif dick <= prinat and dick >= pcs_vag:
+			!!Perfect size
+			stim['act'] = 80
+		elseif dick < pcs_vag:
+			!!On the small side
+			stim['act'] = 70
+		end
+	elseif $ARGS[0] = 'vaginal_strap':
+		counter['vaginal_strap'] = 1
+		stim['mag'] += 1
+		if dick > pcs_vag: pcs_vag += 1
+		prinat = pcs_vag + (pcs_horny / 10)
+		if dick >= prinat * 2:
+			!!Painfully too big for PC
+			stim['act'] = 20
+			if vgape < 3:vgape = 3
+		elseif dick > prinat:
+			!!Big, but more bearable
+			stim['act'] = 65
+			if vgape < 1:vgape = 1
+		elseif dick <= prinat and dick >= pcs_vag:
+			!!Perfect size
+			stim['act'] = 80
+		elseif dick < pcs_vag:
+			!!On the small side
+			stim['act'] = 70
+		end
+	elseif $ARGS[0] = 'vaginal_vibe':
+		counter['vaginal_vibe'] = 1
+		stim['mag'] += 2
+		stim['act'] = 90
+	elseif $ARGS[0] = 'flash_breasts':
+		counter['flash_breasts'] = 1
+		stim['act'] = 30
+	elseif $ARGS[0] = 'flash_pussy':
+		counter['flash_pussy'] = 1
+		stim['act'] = 10
+	elseif $ARGS[0] = 'flash_ass':
+		counter['flash_ass'] = 1
+		stim['act'] = 10
+	elseif $ARGS[0] = 'kiss_give':
+		stim['act'] = 20
+	elseif $ARGS[0] = 'breasts_give':
+		stim['act'] = 20
+	elseif $ARGS[0] = 'massage_give':
+		stim['act'] = 10
+	elseif $ARGS[0] = 'foreplay_give':
+		stim['act'] = 20
+	elseif $ARGS[0] = 'cuni_give':
+		counter['cuni_give'] = 1
+		stim['act'] = 30
+		stim_les = 1
+	elseif $ARGS[0] = 'rimming_give':
+		counter['rimming_give'] = 1
+		stim['act'] = 25
+	elseif $ARGS[0] = 'anal_finger_give':
+		counter['anal_finger_give'] = 1
+		stim['act'] = 40
+	elseif $ARGS[0] = 'anal_fist_give':
+		counter['anal_fist_give'] = 1
+		stim['act'] = 30
+	elseif $ARGS[0] = 'anal_dildo_give':
+		counter['anal_dildo_give'] = 1
+		stim['act'] = 40
+	elseif $ARGS[0] = 'anal_vibe_give':
+		counter['anal_vibe_give'] = 1
+		stim['act'] = 40
+	elseif $ARGS[0] = 'anal_strap_give':
+		counter['anal_strap_give'] = 1
+		stim['act'] = 40
+	elseif $ARGS[0] = 'vaginal_finger_give':
+		counter['vaginal_finger_give'] = 1
+		stim['act'] = 60
+		stim_les = 1
+	elseif $ARGS[0] = 'vaginal_fist_give':
+		counter['vaginal_fist_give'] = 1
+		stim['act'] = 50
+		stim_les = 1
+	elseif $ARGS[0] = 'vaginal_dildo_give':
+		counter['vaginal_dildo_give'] = 1
+		stim['act'] = 60
+		stim_les = 1
+	elseif $ARGS[0] = 'vaginal_strap_give':
+		counter['vaginal_strap_give'] = 1
+		stim['act'] = 70
+		stim_les = 1
+	elseif $ARGS[0] = 'vaginal_vibe_give':
+		counter['vaginal_vibe_give'] = 1
+		stim['act'] = 60
+		stim_les = 1
+	elseif $ARGS[0] = 'hj':
+		counter['hj'] = 1
+		stim['act'] = 25
+	elseif $ARGS[0] = 'bj':
+		counter['bj'] = 1
+		stim['act'] = 45
+		if dick > pcs_throat: pcs_throat += 1
+		stim_foot = 1
+	elseif $ARGS[0] = 'footjob':
+		counter['footjob'] = 1
+		stim['act'] = 25
+	end
+
+	if stim['mag'] > 9: stim['mag'] = 9
+
+	minut += ARGS[1]
+	stim['time'] = ARGS[1]
+
+
+!!Adds effects due to sexual perversions
+	stim['kinkno'] = 0
+	stim['kink'] = 0
+
+!! Auto adding of lesbian and foot fetishes for acts that must involve them
+	if stim_les = 1:
+		stim['kink'] += lesbian['exp']
+		stim['pref'] += lesbian['pref']
+		stim['kinkno'] += 1
+		stim['lesbian'] = 1
+	end
+
+	if stim_foot = 1:
+		stim['kink'] += feet['exp']
+		stim['pref'] += feet['pref']
+		stim['kinkno'] += 1
+		stim['feet'] = 1
+	end
+
+	i = 2
+	:stimloop
+	if $ARGS[i] ! '':
+!!Skipping lesbian and foot where auto added to avoid duplication
+		if stim_les = 1 and $ARGS[i] = 'lesbian':i += 1 & jump 'stimloop'
+		if stim_foot = 1 and $ARGS[i] = 'feet':i += 1 & jump 'stimloop'
+		if $ARGS[i] = 'bound':
+			stim['kink'] += bondage['exp']
+			stim['pref'] += bondage['pref']
+			stim['kinkno'] += 1
+			stim['bound'] = 1
+		elseif $ARGS[i] = 'beast':
+			stim['kink'] += bestiality['exp']
+			stim['pref'] += bestiality['pref']
+			stim['kinkno'] += 1
+			stim['beast'] = 1
+		elseif $ARGS[i] = 'exhibitionism':
+			stim['kink'] += exhibitionism['exp']
+			stim['pref'] += exhibitionism['pref']
+			exhibition_exp += rand(2,6)
+			stim['kinkno'] += 1
+			stim['exhibitionism'] = 1
+		elseif $ARGS[i] = 'rough':
+			stim['kink'] += rough['exp']
+			stim['pref'] += rough['pref']
+			stim['kinkno'] += 1
+			stim['rough'] = 1
+		elseif $ARGS[i] = 'prostitution':
+			stim['kink'] += prostitution['exp']
+			stim['pref'] += prostitution['pref']
+			stim['kinkno'] += 1
+			stim['prostitution'] = 1
+		elseif $ARGS[i] = 'dom':
+			stim['kink'] += dom['exp']
+			stim['pref'] += pcs_dom
+			stim['kinkno'] += 1
+			stim['dom'] = 1
+		elseif $ARGS[i] = 'sub':
+			stim['kink'] += sub['exp']
+			stim['pref'] += sub
+			stim['kinkno'] += 1
+			stim['sub'] = 1
+		elseif $ARGS[i] = 'incest':
+			stim['kink'] += incest['exp']
+			stim['pref'] += incest['pref']
+			stim['kinkno'] += 1
+			stim['incest'] = 1
+		elseif $ARGS[i] = 'feet':
+			stim['kink'] += feet['exp']
+			stim['pref'] += feet['pref']
+			stim['kinkno'] += 1
+			stim['feet'] = 1
+		elseif $ARGS[i] = 'lesbian':
+			stim['kink'] += lesbian['exp']
+			stim['pref'] += lesbian['pref']
+			stim['kinkno'] += 1
+			stim['lesbian'] = 1
+		elseif $ARGS[i] = 'group':
+			stim['kink'] += group['exp']
+			stim['pref'] += group['pref']
+			stim['kinkno'] += 1
+			stim['group'] = 1
+		elseif $ARGS[i] = 'gangbang':
+			stim['kink'] += gangbang['exp']
+			stim['pref'] += gangbang['pref']
+			stim['kinkno'] += 1
+			stim['gangbang'] = 1
+		elseif $ARGS[i] = 'humiliation':
+			stim['kink'] += humiliation['exp']
+			stim['pref'] += humiliation['pref']
+			stim['kinkno'] += 1
+			stim['humiliation'] = 1
+		elseif $ARGS[i] = 'maso':
+			stim['kink'] += maso['exp']
+			stim['pref'] += maso['pref']
+			stim['kinkno'] += 1
+			stim['maso'] = 1
+		elseif $ARGS[i] = 'deepthroat':
+			stim['kink'] += deepthroat['exp']
+			stim['pref'] += deepthroat['pref']
+			stim['kinkno'] += 1
+			stim['deepthroat'] = 1
+!!unknown is for sex with an unknown partner, this could be a gloryhole or unconscious
+		elseif $ARGS[i] = 'unknown':
+			stim['kink'] += unknown['exp']
+			stim['pref'] += unknown['pref']
+			stim['kinkno'] += 1
+			stim['unknown'] = 1
+		end
+
+		i += 1
+		jump 'stimloop'
+	end
+
+!!Fetishes are divided by total number of fetishes
+	if stim['kinkno'] ! 0:
+		stim['kink'] = stim['kink']/stim['kinkno']
+		stim['pref'] = (stim['pref']/stim['kinkno'])
+		stim['kinkno'] = 0
+	end
+
+!!Bonus from fetishes, randomised chance for each level of bonus
+	if rand(0,100) < stim['kink']:
+		stim['kink'] = 120
+	elseif rand(0,80) < stim['kink']:
+		stim['kink'] = 110
+	elseif rand(0,60) < stim['kink']:
+		stim['kink'] = 100
+	elseif rand(0,40) < stim['kink']:
+		stim['kink'] = 90
+	else
+		stim['kink'] = 80
+	end
+
+!!arousal calculation
+	stim['total'] = ((stim['mag']*stim['act']*stim['kink']/100) + stim['pref'])*stim['time'] / 120
+
+!!Reduction in arousal linked to pain, masochism helps to deal with this
+	if pain['total'] > 0:
+		if maso['pref'] <= 0 and pain['total'] < 50:
+			if pain['total'] - (maso['exp'] + 1 / 6) > 0:stim['total'] -= (pain['total'] - (maso['exp'] / 6))
+		elseif maso['pref'] < 25 and pain['total'] < 55:
+			stim['total'] += (pain['total'] * maso['exp'] +1 / 400)/60*stim['time']
+		elseif maso['pref'] < 50 and pain['total'] < 70:
+			stim['total'] += (pain['total'] * maso['exp'] + 1 / 300)/60*stim['time']
+		elseif maso['pref'] < 75 and pain['total'] < 85:
+			stim['total'] += (pain['total'] * maso['exp'] + 1 / 200)/60*stim['time']
+		elseif maso['pref'] >= 75:
+			stim['total'] += (pain['total'] * maso['exp'] + 1 / 100)/60*stim['time']
+		else
+			stim['total'] = 0
+		end
+	end
+
+	stim['event'] += stim['total']
+
+	pcs_horny += stim['total']
+
+!!	This is to allow a Succubus with the right skill level to handle any size then go back to original size
+	if sucvagorg ! 0 and sucvagorg ! pcs_vag: pcs_vag = sucvagorg & killvar 'sucvagorg'
+	if sucanusorg ! 0 and sucanusorg ! pcs_ass: pcs_ass = sucanusorg & killvar 'sucanusorg'
+
+!!-------------------Orgasm-------------------
+!!This is intended to be hidden and the stats and calculations should not appear in game.
+
+	orgasm_buildup += stim['total']
+
+	if $orgasm_or ! 'no':
+		if $orgasm_or = 'yes' or $orgasm_or = 'custom':
+			gs 'orgasm', $ARGS[0]
+		elseif orgasm_buildup >= 100 and rand(1,100) <= 20:
+			gs 'orgasm', $ARGS[0]
+		elseif orgasm_buildup >= 150 and rand(1,100) <= 50:
+			gs 'orgasm', $ARGS[0]
+		elseif orgasm_buildup >= 200:
+			gs 'orgasm', $ARGS[0]
+		end
+	end
+end
+
+!!-----------------------------------------------
+
+if $ARGS[0] = 'end':
+	if stim['lesbian'] = 1: lesbian += 1
+	if stim['gang'] = 1 or stim['group'] = 1: gang += 1
+	if $orgasm_or = 'no': $orgasm_or = ''
+
+!!Updating fetish exp for acts carried out and clearing data
+	gs 'arousal', 'checks', 'maso'
+	gs 'arousal', 'checks', 'bound'
+	gs 'arousal', 'checks', 'beast'
+	gs 'arousal', 'checks', 'exhibitionism'
+	gs 'arousal', 'checks', 'rough'
+	gs 'arousal', 'checks', 'prostitution'
+	gs 'arousal', 'checks', 'dom'
+	gs 'arousal', 'checks', 'sub'
+	gs 'arousal', 'checks', 'incest'
+	gs 'arousal', 'checks', 'feet'
+	gs 'arousal', 'checks', 'lesbian'
+	gs 'arousal', 'checks', 'group'
+	gs 'arousal', 'checks', 'gangbang'
+	gs 'arousal', 'checks', 'humiliation'
+	gs 'arousal', 'checks', 'deepthroat'
+	gs 'arousal', 'checks', 'unknown'
+
+	stim['event'] = 0
+
+!!Adding to counters for character stats
+	if counter['mast'] = 1: stat['mast'] += 1
+	if counter['porn'] = 1: stat['porn'] += 1
+	if counter['voyeur'] = 1: stat['voyeur'] += 1
+	if counter['cuni'] = 1: stat['cuni'] += 1
+	if counter['rimming'] = 1: stat['rimming'] += 1
+	if counter['trib'] = 1: stat['trib'] += 1
+	if counter['anal'] = 1: stat['anal'] += 1
+	if counter['anal_finger'] = 1: stat['anal_finger'] += 1
+	if counter['anal_fist'] = 1: stat['anal_fist'] += 1
+	if counter['anal_dildo'] = 1: stat['anal_dildo'] += 1
+	if counter['anal_strap'] = 1: stat['anal_strap'] += 1
+	if counter['anal_vibe'] = 1: stat['anal_vibe'] += 1
+	if counter['vaginal'] = 1: stat['vaginal'] += 1
+	if counter['vaginal_finger'] = 1: stat['vaginal_finger'] += 1
+	if counter['vaginal_fist'] = 1: stat['vaginal_fist'] += 1
+	if counter['vaginal_dildo'] = 1: stat['vaginal_dildo'] += 1
+	if counter['vaginal_strap'] = 1: stat['vaginal_strap'] += 1
+	if counter['vaginal_vibe'] = 1: stat['vaginal_vibe'] += 1
+	if counter['flash_breasts'] = 1: stat['flash_breasts'] += 1
+	if counter['flash_pussy'] = 1: stat['flash_pussy'] += 1
+	if counter['flash_ass'] = 1: stat['flash_ass'] += 1
+	if counter['cuni_give'] = 1: stat['cuni_give'] += 1
+	if counter['rimming_give'] = 1: stat['rimming_give'] += 1
+	if counter['anal_finger_give'] = 1: stat['anal_finger_give'] += 1
+	if counter['anal_fist_give'] = 1: stat['anal_fist_give'] += 1
+	if counter['anal_dildo_give'] = 1: stat['anal_dildo_give'] += 1
+	if counter['anal_vibe_give'] = 1: stat['anal_vibe_give'] += 1
+	if counter['anal_strap_give'] = 1: stat['anal_strap_give'] += 1
+	if counter['vaginal_finger_give'] = 1: stat['vaginal_finger_give'] += 1
+	if counter['vaginal_fist_give'] = 1: stat['vaginal_fist_give'] += 1
+	if counter['vaginal_dildo_give'] = 1: stat['vaginal_dildo_give'] += 1
+	if counter['vaginal_strap_give'] = 1: stat['vaginal_strap_give'] += 1
+	if counter['vaginal_vibe_give'] = 1: stat['vaginal_vibe_give'] += 1
+	if counter['hj'] = 1: stat['hj'] += 1
+	if counter['bj'] = 1: stat['bj'] += 1
+	if counter['footjob'] = 1: stat['footjob'] += 1
+end
+
+if $ARGS[0] = 'checks':
+	if dyneval('RESULT = stim[''<<$ARGS[1]>>'']') = 1:
+		dynamic 'stim[''<<$ARGS[1]>>''] = 0'
+		dynamic '<<$ARGS[1]>>[''exp''] += 1'
+	end
+end
+
+--- arousal ---------------------------------
+

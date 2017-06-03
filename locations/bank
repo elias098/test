@@ -1,0 +1,114 @@
+# bank
+if $ARGS[0] = 'start':
+	cla
+	clr
+	*clr
+	minut += 5
+	gs 'stat'
+	if night_mode = 1:
+		fcolor = rgb(255, 255, 255)
+		bcolor = rgb(0, 0, 0)
+		lcolor = rgb(106, 90, 205)
+	else
+		fcolor = rgb(0, 0, 0)
+		bcolor = rgb(255, 255, 255)
+		lcolor = rgb(106, 90, 205)
+	end
+	'<center><b><font color="maroon">Bank</font></b></center>'
+	'<center><img src="images/locations/city/citycenter/bank/bank.jpg"></center>'
+
+	if week <= 5 and hour = 16 and minut >= 30 and mey_vika['mey_vika_qw'] >= 32: 
+		!r125
+		'Looks like <a href="exec:gs''mey_tamara_events'',''tamara''">Tamara Mikhailovna</a> is going home.'
+	end	
+	
+	if bankAccount = 0:
+		'Do you want to open your account?'
+	else
+		if karta >= 0:
+			'You have <<karta>> <b>₽</b> in your account.'
+			'You have an approved credit of <font color="blue"><<bankDebtLimit>></font>!'
+		else
+			'You hava a debt of <font color="red"><<-1 * karta>></font> <b>₽</b>.'
+			'You have an approved credit of <font color="blue"><<bankDebtLimit + karta>></font>!'
+		end
+	end
+
+	if BankPapper = 1 and dayBankPapper = daystart:
+		act 'Give documents':
+			cls
+			minut += 15
+			BankPapper = 2
+			gs 'stat'
+			'You went to the office and gave the documents to the manager.'
+
+			act 'Leave':
+				minut += 5
+				if bankloc = 1:
+					gt 'down'
+				else
+					gt 'pavCommercial'
+				end
+			end
+		end
+	end
+
+	if money > 0:
+		act 'Deposit money':
+			cla
+			minut += 5
+			kartaIN = input ("How much money you want to deposit into the account?")
+
+			if kartaIN <= 0 or kartaIN > money:
+				'That is not a valid operation.'
+			else
+				karta += kartaIN
+				money -= kartaIN
+				
+				if bankAccount = 0: 
+					bankAccount = 1
+					bankDebtLimit = 5000
+				end
+				
+				'<br>You deposited <<kartaIN>> <b>₽</b>, your account balance is now <<karta>> <b>₽</b>.'
+			end
+
+			act 'Move away':gt 'bank', 'start'
+		end
+	end
+
+	if karta + bankDebtLimit > 0:
+		act 'Withdraw money':
+			cla
+			minut += 5
+			kartaOUT = input ("How much do you want to withdraw from account?")
+
+			if kartaOUT <= 0 or kartaOUT > karta + bankDebtLimit:
+				'That is not a valid operation.'
+			else
+				karta -= kartaOUT
+				money += kartaOUT
+				if karta > 0:
+					'<br>You withdraw <<kartaOUT>> <b>₽</b>. You have <<karta>> <b>₽</b> left in your bank account.'
+				elseif karta = 0:
+					'<br>You withdraw <<kartaOUT>> <b>₽</b>. You have no money left in your bank account.'
+				else
+					'<br>You withdraw <<kartaOUT>> <b>₽</b>. <font color="red">Your bank account is overdrawn by <b><<karta>> ₽</b>.</font>'
+				end
+			end
+			act 'Move away':gt 'bank', 'start'
+		end
+	end
+
+	act 'Leave':
+		minut += 5
+		if bankloc = 1:
+			gt 'down'
+		else
+			gt 'pavCommercial'
+		end
+	end
+end
+
+--- bank ---------------------------------
+

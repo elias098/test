@@ -1,0 +1,5 @@
+# $menu_descrip
+gs 'obj_din', 'descrip'
+
+--- $menu_descrip ---------------------------------
+
